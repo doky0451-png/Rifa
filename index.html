@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gran Rifa Benéfica - Simulador Oficial</title>
+    <style>
+        :root {
+            --primary: #ff4e50;
+            --secondary: #f9d423;
+            --dark: #1e1e24;
+            --light: #fff;
+            --success: #2ecc71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            max-width: 800px;
+            width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 35px;
+            backdrop-filter: blur(10px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #d32f2f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Sección de números elegidos */
+        .preview-section {
+            background: #f8f9fa;
+            border: 2px dashed #ccc;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #444;
+        }
+
+        .balls-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            min-height: 50px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .ball {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #e0e0e0);
+            border: 2px solid #b5b5b5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .ball.user-selected {
+            background: radial-gradient(circle at 30% 30%, #ff7675, #d63031);
+            color: white;
+            border-color: #c0392b;
+            animation: pop 0.3s ease;
+        }
+
+        .ball.winner-selected {
+            background: radial-gradient(circle at 30% 30%, #ffeaa7, #fdcb6e);
+            color: #2d3436;
+            border-color: #e1b12c;
+        }
+
+        /* Tablero de botones */
+        .board-container {
+            margin-bottom: 35px;
+        }
+
+        .board-instruction {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .grid-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-board { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        .btn-number {
+            padding: 12px 0;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-number:hover {
+            background: #ffeaea;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-number.active {
+            background: var(--primary);
+            color: white;
+            border-color: #d32f2f;
+            box-shadow: 0 4px 10px rgba(255, 78, 80, 0.4);
+        }
+
+        /* Acciones y resultados */
+        .actions {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-main {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+            transition: all 0.3s;
+        }
+
+        .btn-main:hover:not(:disabled) {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+
+        .btn-main:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .results-section {
+            background: #edf2f7;
+            border-radius: 16px;
+            padding: 25px;
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2d3748;
+            text-align: center;
+        }
+
+        .prize-box {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border-left: 5px solid var(--success);
+            font-size: 1.1rem;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🎟️ Gran Rifa </h1>
+        <p>Selecciona tus 6 números de la suerte y apoya nuestra noble causa</p>
+    </header>
+
+    <div class="preview-section">
+        <div class="preview-title">Tus Números Seleccionados </div>
+        <div id="user-balls" class="balls-container">
+            <div class="ball">-</div>
+            <div class="ball">-</div>
+            <div class="ball">-</div>
+            <div class="ball">-</div>
+            <div class="ball">-</div>
+            <div class="ball">-</div>
+        </div>
+    </div>
+
+    <div class="board-container">
+        <div class="board-instruction">Haz clic sobre 6 números diferentes (1 al 50)[cite: 8]:</div>
+        <div id="board" class="grid-board"></div>
+    </div>
+
+    <div class="actions">
+        <button id="btn-draw" class="btn-main" disabled>¡Lanzar Jugada Ganadora! 🎲</button>
+    </div>
+
+    <div id="results" class="results-section">
+        <div class="result-title">🎯 Resultados del Sorteo</div>
+        <div style="text-align: center; margin-bottom: 15px; font-weight: 500;">Números Ganadores[cite: 64]:</div>
+        <div id="winner-balls" class="balls-container"></div>
+        
+        <div id="prize-result" class="prize-box"></div>
+    </div>
+</div>
+
+<script src="../js/app.js"></script>
+</body>
+</html>
